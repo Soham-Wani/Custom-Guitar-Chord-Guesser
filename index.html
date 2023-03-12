@@ -2,17 +2,43 @@
 <html>
 
 <head>
-    <title>Random Image Display</title>
+    <title>Guitar Chord Guesser</title>
+    <style>
+        #settings-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            z-index: 999;
+            display: none;
+        }
+    </style>
 </head>
 
 <body>
-    <div id="image-container">
-        <img id="random-image" src="" alt="" />
-        <p id="image-name"></p>
+    <div id="images-container">
+        <img id="random-chord" src="" alt="Random Chord" />
+        <p id="chord-name"></p>
+        <button id="settings-button">Settings</button>
+        <div id="settings-container" style="display:none;">
+            <label for="only-img-time">Only Image Time (in seconds):</label>
+            <input type="number" id="only-img-time" value="7" min="1"><br>
+            <label for="text-time">Text Time (in seconds):</label>
+            <input type="number" id="text-time" value="3" min="1"><br>
+            <label for="gap-time">Gap Time (in seconds):</label>
+            <input type="number" id="gap-time" value="3" min="1"><br>
+            <button id="update-button">Update</button>
+            <button id="default-button">Default</button>
+            <button id="cancel-button">Cancel</button>
+        </div>
+
     </div>
 
     <script>
-        // Define arrays of images and their names
+        // Define arrays of chords images and names
         const allChordsImages = [
             "https://cdn.pixabay.com/photo/2023/02/14/18/55/flowers-7790227_640.jpg",
             "https://cdn.pixabay.com/photo/2023/01/31/05/59/zebra-7757193_640.jpg",
@@ -28,33 +54,99 @@
             "Chord E",
         ];
 
-        // Get references to the image and name elements
-        const imageElement = document.getElementById("random-image");
-        const nameElement = document.getElementById("image-name");
+        // Get HTML elements
+        const settingsButton = document.getElementById('settings-button');
+        const settingsContainer = document.getElementById('settings-container');
+        const updateButton = document.getElementById('update-button');
+        const cancelButton = document.getElementById('cancel-button');
+        const defaultButton = document.getElementById('default-button');
+        const onlyImgTimeInput = document.getElementById('only-img-time');
+        const textTimeInput = document.getElementById('text-time');
+        const gapTimeInput = document.getElementById('gap-time');
 
-        // Display a random image and name
+        // Load values from local storage
+        let onlyImgTime = parseInt(localStorage.getItem('onlyImgTime')) || 7;
+        let textTime = parseInt(localStorage.getItem('textTime')) || 3;
+        let gapTime = parseInt(localStorage.getItem('gapTime')) || 0;
+
+        // Update input values
+        onlyImgTimeInput.value = onlyImgTime;
+        textTimeInput.value = textTime;
+        gapTimeInput.value = gapTime;
+
+        // Show/hide settings container
+        settingsButton.addEventListener('click', () => {
+            settingsContainer.style.display = (settingsContainer.style.display === 'none') ? 'block' : 'none';
+        });
+
+        // Handle update button click event
+        updateButton.addEventListener('click', () => {
+            // Check if input values are valid
+            if (onlyImgTimeInput.value < 1 || textTimeInput.value < 1 || gapTimeInput.value < 0) {
+                alert("Please enter values greater than or equal to 1");
+                return;
+            }
+            // Update variable values and store in local storage
+            onlyImgTime = parseInt(onlyImgTimeInput.value);
+            textTime = parseInt(textTimeInput.value);
+            gapTime = parseInt(gapTimeInput.value);
+            localStorage.setItem('onlyImgTime', onlyImgTime);
+            localStorage.setItem('textTime', textTime);
+            localStorage.setItem('gapTime', gapTime);
+            location.reload();
+        });
+
+        // Add an event listener to the "Default" button
+        defaultButton.addEventListener('click', () => {
+            // Set the default values for the variables
+            onlyImgTime = 7;
+            textTime = 3;
+            gapTime = 3;
+
+            // Store the default values in local storage
+            localStorage.setItem('onlyImgTime', onlyImgTime);
+            localStorage.setItem('textTime', textTime);
+            localStorage.setItem('gapTime', gapTime);
+
+            // Update the input values
+            onlyImgTimeInput.value = onlyImgTime;
+            textTimeInput.value = textTime;
+            gapTimeInput.value = gapTime;
+            location.reload();
+        });
+
+        // Handle cancel button click event
+        cancelButton.addEventListener('click', () => {
+            settingsContainer.style.display = 'none';
+        });
+
+        // Get references to the image and name elements
+        const imageElement = document.getElementById("random-chord");
+        const nameElement = document.getElementById("chord-name");
+
+        // Display a random image and name pair
         function displayRandomImage() {
             const randomIndex = Math.floor(Math.random() * allChordsImages.length);
             imageElement.src = allChordsImages[randomIndex];
 
-            // Show the image for 7 seconds
+            // Show the image alone
             imageElement.style.display = "block";
             setTimeout(() => {
-                // Show the name for 3 seconds
+                // Show the name with the image still displaying
                 nameElement.style.display = "block";
                 nameElement.textContent = allChordsNames[randomIndex];
 
-                // Hide the name and image after 3 seconds
+                // Hide the name and image to repeat
                 setTimeout(() => {
                     nameElement.style.display = "none";
                     imageElement.style.display = "none";
 
-                    // Display the new image after hiding the previous one
+                    // Display the new set after hiding the previous one
                     setTimeout(() => {
                         displayRandomImage();
-                    }, 3000);
-                }, 3000);
-            }, 7000);
+                    }, gapTime * 1000);
+                }, textTime * 1000);
+            }, onlyImgTime * 1000);
         }
 
         // Display the first image and hide the name initially
