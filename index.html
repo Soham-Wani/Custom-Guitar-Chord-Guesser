@@ -2,96 +2,65 @@
 <html>
 
 <head>
-    <title>Quiz</title>
-    <style>
-        ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-
-        li {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-
-        .option {
-            cursor: pointer;
-        }
-
-        .option:hover {
-            background-color: lightgray;
-        }
-    </style>
-    <script>
-        // Define the quiz questions and answers
-        var questions = [
-            "Image 1",
-            "Image 2",
-            "Image 3"
-        ];
-        var answers = [
-            "Answer 1",
-            "Answer 2",
-            "Answer 3"
-        ];
-        var options = [
-            "Random 1", "Random 2", "Random 3"
-        ];
-
-        // Shuffle function to randomize the order of the answer options
-        function shuffle(array) {
-            var currentIndex = array.length, temporaryValue, randomIndex;
-
-            while (0 !== currentIndex) {
-                randomIndex = Math.floor(Math.random() * currentIndex);
-                currentIndex -= 1;
-                temporaryValue = array[currentIndex];
-                array[currentIndex] = array[randomIndex];
-                array[randomIndex] = temporaryValue;
-            }
-
-            return array;
-        }
-
-        // Function to display the quiz questions
-        function displayQuestion() {
-            var questionIndex = Math.floor(Math.random() * questions.length);
-            var question = questions[questionIndex];
-            var answer = answers[questionIndex];
-            var incorrectOptions = shuffle(options.filter(function (option) { return option !== answer })).slice(0, 3);
-            var shuffledOptions = shuffle([answer, ...incorrectOptions]);
-
-            document.getElementById("question").innerHTML = question;
-
-            var optionsHTML = "";
-            for (var i = 0; i < shuffledOptions.length; i++) {
-                optionsHTML += "<li><span class='option' data-value='" + shuffledOptions[i] + "'>" + shuffledOptions[i] + "</span></li>";
-            }
-            document.getElementById("options").innerHTML = optionsHTML;
-
-            var optionElements = document.querySelectorAll(".option");
-            for (var i = 0; i < optionElements.length; i++) {
-                optionElements[i].onclick = function () {
-                    var userAnswer = this.getAttribute("data-value");
-                    if (userAnswer == answer) {
-                        alert("Congratulations! Your answer is correct.");
-                    } else {
-                        alert("Sorry, your answer is incorrect. The correct answer is " + answer + ".");
-                    }
-                    displayQuestion();
-                };
-            }
-        }
-
-    </script>
+    <title>Random Image Display</title>
 </head>
 
-<body onload="displayQuestion()">
-    <h1>Quiz</h1>
-    <p id="question"></p>
-    <ul id="options"></ul>
+<body>
+    <div id="image-container">
+        <img id="random-image" src="" alt="" />
+        <p id="image-name"></p>
+    </div>
+
+    <script>
+        // Define arrays of images and their names
+        const allChordsImages = [
+            "https://cdn.pixabay.com/photo/2023/02/14/18/55/flowers-7790227_640.jpg",
+            "https://cdn.pixabay.com/photo/2023/01/31/05/59/zebra-7757193_640.jpg",
+            "https://cdn.pixabay.com/photo/2023/01/05/22/35/flower-7700011_640.jpg",
+            "https://cdn.pixabay.com/photo/2023/01/23/09/26/cat-7738210__340.jpg",
+            "https://cdn.pixabay.com/photo/2023/01/27/06/17/pheasant-7747830__340.jpg",
+        ];
+        const allChordsNames = [
+            "Chord A",
+            "Chord B",
+            "Chord C",
+            "Chord D",
+            "Chord E",
+        ];
+
+        // Get references to the image and name elements
+        const imageElement = document.getElementById("random-image");
+        const nameElement = document.getElementById("image-name");
+
+        // Display a random image and name
+        function displayRandomImage() {
+            const randomIndex = Math.floor(Math.random() * allChordsImages.length);
+            imageElement.src = allChordsImages[randomIndex];
+
+            // Show the image for 7 seconds
+            imageElement.style.display = "block";
+            setTimeout(() => {
+                // Show the name for 3 seconds
+                nameElement.style.display = "block";
+                nameElement.textContent = allChordsNames[randomIndex];
+
+                // Hide the name and image after 3 seconds
+                setTimeout(() => {
+                    nameElement.style.display = "none";
+                    imageElement.style.display = "none";
+
+                    // Display the new image after hiding the previous one
+                    setTimeout(() => {
+                        displayRandomImage();
+                    }, 3000);
+                }, 3000);
+            }, 7000);
+        }
+
+        // Display the first image and hide the name initially
+        displayRandomImage();
+        nameElement.style.display = "none";
+    </script>
 </body>
 
 </html>
