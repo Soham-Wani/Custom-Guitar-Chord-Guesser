@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Quiz</title>
+    <style>
+        ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        li {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .option {
+            cursor: pointer;
+        }
+
+        .option:hover {
+            background-color: lightgray;
+        }
+    </style>
+    <script>
+        // Define the quiz questions and answers
+        var questions = [
+            "Image 1",
+            "Image 2",
+            "Image 3"
+        ];
+        var answers = [
+            "Answer 1",
+            "Answer 2",
+            "Answer 3"
+        ];
+        var options = [
+            "Random 1", "Random 2", "Random 3"
+        ];
+
+        // Shuffle function to randomize the order of the answer options
+        function shuffle(array) {
+            var currentIndex = array.length, temporaryValue, randomIndex;
+
+            while (0 !== currentIndex) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex -= 1;
+                temporaryValue = array[currentIndex];
+                array[currentIndex] = array[randomIndex];
+                array[randomIndex] = temporaryValue;
+            }
+
+            return array;
+        }
+
+        // Function to display the quiz questions
+        function displayQuestion() {
+            var questionIndex = Math.floor(Math.random() * questions.length);
+            var question = questions[questionIndex];
+            var answer = answers[questionIndex];
+            var incorrectOptions = shuffle(options.filter(function (option) { return option !== answer })).slice(0, 3);
+            var shuffledOptions = shuffle([answer, ...incorrectOptions]);
+
+            document.getElementById("question").innerHTML = question;
+
+            var optionsHTML = "";
+            for (var i = 0; i < shuffledOptions.length; i++) {
+                optionsHTML += "<li><span class='option' data-value='" + shuffledOptions[i] + "'>" + shuffledOptions[i] + "</span></li>";
+            }
+            document.getElementById("options").innerHTML = optionsHTML;
+
+            var optionElements = document.querySelectorAll(".option");
+            for (var i = 0; i < optionElements.length; i++) {
+                optionElements[i].onclick = function () {
+                    var userAnswer = this.getAttribute("data-value");
+                    if (userAnswer == answer) {
+                        alert("Congratulations! Your answer is correct.");
+                    } else {
+                        alert("Sorry, your answer is incorrect. The correct answer is " + answer + ".");
+                    }
+                    displayQuestion();
+                };
+            }
+        }
+
+    </script>
+</head>
+
+<body onload="displayQuestion()">
+    <h1>Quiz</h1>
+    <p id="question"></p>
+    <ul id="options"></ul>
+</body>
+
+</html>
