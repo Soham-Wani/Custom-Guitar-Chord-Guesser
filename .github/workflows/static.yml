@@ -15,4 +15,4 @@ jobs:
 
     - name: Build site
       run: |
-        sed -i "s|{{PASSWORD}}|$PASSWORD|g" index.html
+        sed -i "s|{{APIKEY}}|$APIKEY|g" index.html
